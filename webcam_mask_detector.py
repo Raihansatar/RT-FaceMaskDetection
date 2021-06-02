@@ -106,7 +106,7 @@ weightsPath = r"face_detector\res10_300x300_ssd_iter_140000.caffemodel"
 faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
 
 # load the face mask detector model from disk
-maskNet = load_model("mask_detectorv3.model")
+maskNet = load_model("mask_detectorv2.model")
 
 # initialize the video stream
 print("[INFO] starting video stream...")
@@ -139,21 +139,19 @@ while True:
 			label = "Incorrect Mask"
 			print ("Mask:" , mask, "Incorrect Maskqweqweqwe:" , incorrect_mask, " W/Mask:" , without_mask)
 		else:
-			label = "Without Mask"
+			label = "No Mask"
 			print ("Mask:" , mask, "Incorrect Mask:" , incorrect_mask, " W/Maskqweqweqwe:" , without_mask)
 		
-		# print ("Mask:" , mask, "Without Mask:" , incorrect_mask) if mask > incorrect_mask else print ("without Mask:" , incorrect_mask, "Mask: ", mask)
-		# print ("Mask:" , mask, "Incorrect Mask:" , incorrect_mask, " W/Mask:" , without_mask)
-		color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
+		# Set color of label
 		if label == "Mask":
 			color = (0, 255, 0)
 		elif label == "Incorrect Mask":
-			(0, 0, 255)
+			color = (0, 255, 255)
 		else:
-			(255, 0, 0)
+			color = (0, 0, 255)
 
 		# include the probability in the label
-		label = "{}: {:.2f}%".format(label, max(mask, incorrect_mask) * 100)
+		label = "{}: {:.2f}%".format(label, max(mask, incorrect_mask, without_mask) * 100)
 
 		# display the label and bounding box rectangle on the output
 		# frame

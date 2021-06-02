@@ -39,19 +39,24 @@ print("[INFO] Loading images...")
 
 data = []
 labels = []
+n_labels = len(CATEGORIES)
 
-for category in CATEGORIES:
-    path = os.path.join(DIRECTORY, category)
-    for img in os.listdir(path): # return all dir in that path
-        img_path = os.path.join(path, img) # join path to corresponding image
-        image = load_img(img_path, target_size=(224, 224))
-        image = img_to_array(image) # convert image to array
-        image = preprocess_input(image) # mobile app related??
+# for category in CATEGORIES:
+#     path = os.path.join(DIRECTORY, category)
+#     for img in os.listdir(path): # return all dir in that path
+#         img_path = os.path.join(path, img) # join path to corresponding image
+#         image = load_img(img_path, target_size=(224, 224))
+#         image = img_to_array(image) # convert image to array
+#         image = preprocess_input(image) # mobile app related??
 
-        data.append(image) # append image in data
-        labels.append(category) # append category
+#         data.append(image) # append image in data
+#         labels.append(category) # append category
 
+# np.save('data', data)
+# np.save('labels', labels)
 
+data = np.load('data.npy')
+labels = np.load('labels.npy')
 # we get data as numerical value but label still not
 # below try to convert label to numerical
 # perform one-hot encoding on the labels
@@ -82,7 +87,6 @@ baseModel = MobileNetV2(weights="imagenet", include_top=False,
 
 # construct the head of the model that will be placed on top of the
 # the base model
-n_labels = len(set(labels))
 headModel = baseModel.output
 headModel = AveragePooling2D(pool_size=(7, 7))(headModel)
 headModel = Flatten(name="flatten")(headModel)

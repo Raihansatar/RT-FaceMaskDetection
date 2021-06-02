@@ -1,29 +1,3 @@
-# # import the opencv library
-# import cv2
-# # from google.colab.patches import cv2_imshow
-  
-# # define a video capture object
-# vid = cv2.VideoCapture(0)
-  
-# while(True):
-      
-#     # Capture the video frame
-#     # by frame
-#     ret, frame = vid.read()
-  
-#     # Display the resulting frame
-#     cv2.imshow('Video', frame)
-      
-#     # the 'q' button is set as the
-#     # quitting button you may use any
-#     # desired button of your choice
-#     if cv2.waitKey(1) & 0xFF == ord('q'):
-#         break
-  
-# # After the loop release the cap object
-# vid.release()
-# # Destroy all the windows
-# cv2.destroyAllWindows()
 
 
 # import the necessary packages
@@ -37,13 +11,17 @@ import time
 import cv2
 import os
 
+# path = r'dataset\correct_mask\00000_Mask.jpg'
+# image = cv2.imread(path, 0)
+# cv2.imshow('image', image)
+
 def detect_and_predict_mask(frame, faceNet, maskNet):
 	# grab the dimensions of the frame and then construct a blob
 	# from it
 	(h, w) = frame.shape[:2]
 	blob = cv2.dnn.blobFromImage(frame, 1.0, (224, 224),
 		(104.0, 177.0, 123.0))
-
+	
 	# pass the blob through the network and obtain the face detections
 	faceNet.setInput(blob)
 	detections = faceNet.forward()
@@ -153,13 +131,13 @@ while loop < 4: # change to loop in reading file
 	loop = loop + 1
 
 	# show the output image
-	# cv2.imshow("image", image)
-	# key = cv2.waitKey(1) & 0xFF
+	cv2.imshow("image", image)
+	key = cv2.waitKey(1) & 0xFF
 
-	# # if the `q` key was pressed, break from the loop
-	# if key == ord("q"):
-	# 	break
+	# if the `q` key was pressed, break from the loop
+	if key == ord("q"):
+		break
 
 # do a bit of cleanup
-# cv2.destroyAllWindows()
+cv2.destroyAllWindows()
 # vs.stop()
