@@ -8,8 +8,8 @@ import cv2
 import os
 
 
-DIRECTORY = r"C:\Users\RaihanSatar\OneDrive\Desktop\Soft Computing Face Recognition\data"
-CATEGORIES = ["correct_mask", "incorrect_mask", "without_mask"]
+DIRECTORY = r"C:\Users\RaihanSatar\OneDrive\Desktop\Soft Computing Face Recognition\dataset"
+CATEGORIES = ["correct_mask", "incorrect_mask"]
 
 
 
@@ -91,13 +91,15 @@ for category in CATEGORIES:
     path = os.path.join(DIRECTORY, category)
     loop = 1
     for img in os.listdir(path): # return all dir in that path
-
+        if loop > 50:
+            break
         img_path = os.path.join(path, img) # join path to corresponding image
         print(img_path)
 
         # read image
         image = cv2.imread(img_path)
-        print("Read Image")
+        # image = imutils.resize(image, width=400)
+        # print("Read Image")
         # detect faces in the image and determine if they are wearing a
         # face mask or not
         (locs, preds) = detect_and_predict_mask(image, faceNet, maskNet)
@@ -136,14 +138,19 @@ for category in CATEGORIES:
 
             # display the label and bounding box rectangle on the output
             # image
-            cv2.putText(image, label, (startX, startY - 10),
+            image = cv2.putText(image, label, (startX, startY - 10),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
-            cv2.rectangle(image, (startX, startY), (endX, endY), color, 2)
+            image = cv2.rectangle(image, (startX, startY), (endX, endY), color, 2)
 
-        filename = "/output_picture/"+ category +"/filename"+ str(loop)+ ".jpg"
+        # show the output frame
+        # cv2.imshow("image", image)
+        # cv2.waitKey(0) & 0xFF
+
+        filename = "output_picture/"+ category +"/image_"+ str(loop)+ ".jpg"
+        # print(filename)
         cv2.imwrite(filename, image)
         loop = loop + 1
-        print (loop)
+        # print (loop)
 
 
 
