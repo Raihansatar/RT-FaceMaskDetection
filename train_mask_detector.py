@@ -22,20 +22,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
+# https://stackoverflow.com/questions/61216957/image-classifier-valueerror-found-array-with-dim-3-estimator-expected-2
+
 # initialize the initial learning rate, number of epochs to train for,
 # and batch siz
 INIT_LR = 1e-4
 EPOCHS = 20
 BS = 32
 
-DIRECTORY = r"C:\Users\RaihanSatar\OneDrive\Desktop\Soft Computing Face Recognition\dataset"
-CATEGORIES = ["correct_mask", "incorrect_mask"]
-
-# dir_list = os.listdir(DIRECTORY)  
-# print("Files and directories in '", DIRECTORY, "' :") 
-  
-# # print the list
-# print(dir_list)
+# DIRECTORY = r"C:\Users\RaihanSatar\OneDrive\Desktop\Soft Computing Face Recognition\dataset"
+DIRECTORY = r"C:\Users\RaihanSatar\OneDrive\Desktop\Soft Computing Face Recognition\data"
+CATEGORIES = ["correct_mask", "incorrect_mask", "without_mask"]
 
 
 print("[INFO] Loading images...")
@@ -60,11 +57,12 @@ for category in CATEGORIES:
 # perform one-hot encoding on the labels
 lb = LabelBinarizer()
 labels = lb.fit_transform(labels)
-labels = to_categorical(labels)
+# labels = to_categorical(labels)
 
 data = np.array(data, dtype="float32")
 labels = np.array(labels)
 
+# (trainX, testX, trainY, testY) = train_test_split(data, labels, test_size=0.20, stratify=labels, random_state=42) # can be modified
 (trainX, testX, trainY, testY) = train_test_split(data, labels, test_size=0.20, stratify=labels, random_state=42) # can be modified
 
 # construct the training image generator for data augmentation
@@ -84,12 +82,13 @@ baseModel = MobileNetV2(weights="imagenet", include_top=False,
 
 # construct the head of the model that will be placed on top of the
 # the base model
+n_labels = len(set(labels))
 headModel = baseModel.output
 headModel = AveragePooling2D(pool_size=(7, 7))(headModel)
 headModel = Flatten(name="flatten")(headModel)
 headModel = Dense(128, activation="relu")(headModel)
 headModel = Dropout(0.5)(headModel)
-headModel = Dense(2, activation="softmax")(headModel)
+headModel = Dense(n_labels, activation="softmax")(headModel)
 
 # place the head FC model on top of the base model (this will become
 # the actual model we will train)
@@ -129,7 +128,7 @@ print(classification_report(testY.argmax(axis=1), predIdxs,
 
 # serialize the model to disk
 print("[INFO] saving mask detector model...")
-model.save("mask_detector.model", save_format="h5")
+model.save("mask_detectorv3.model", save_format="h5")
 
 # plot the training loss and accuracy
 N = EPOCHS
@@ -143,4 +142,4 @@ plt.title("Training Loss and Accuracy")
 plt.xlabel("Epoch #")
 plt.ylabel("Loss/Accuracy")
 plt.legend(loc="lower left")
-plt.savefig("plot.png")
+plt.savefig("plotv3.png")

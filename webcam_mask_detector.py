@@ -106,7 +106,7 @@ weightsPath = r"face_detector\res10_300x300_ssd_iter_140000.caffemodel"
 faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
 
 # load the face mask detector model from disk
-maskNet = load_model("mask_detector.model")
+maskNet = load_model("mask_detectorv3.model")
 
 # initialize the video stream
 print("[INFO] starting video stream...")
@@ -115,9 +115,9 @@ vs = VideoStream(src=0).start()
 # loop over the frames from the video stream
 while True:
 	# grab the frame from the threaded video stream and resize it
-	# to have a maximum width of 400 pixels
+	# to have a maximum width of 1024 pixels
 	frame = vs.read()
-	frame = imutils.resize(frame, width=400)
+	frame = imutils.resize(frame, width=1024)
 
 	# detect faces in the frame and determine if they are wearing a
 	# face mask or not
@@ -127,18 +127,33 @@ while True:
 	for (box, pred) in zip(locs, preds):
 		# unpack the bounding box and predictions
 		(startX, startY, endX, endY) = box
-		(mask, withoutMask) = pred
+		(mask, incorrect_mask, without_mask) = pred
 
 		# determine the class label and color we'll use to draw
 		# the bounding box and text
-		label = "Mask" if mask > withoutMask else "Incorrect Mask"
+		# label = "Mask" if mask > incorrect_mask else "Incorrect Mask"
+		if mask > incorrect_mask and mask > without_mask:
+			label = "Mask"
+			print ("Maskqweqweqwe:" , mask, "Incorrect Mask:" , incorrect_mask, " W/Mask:" , without_mask)
+		elif incorrect_mask > without_mask:
+			label = "Incorrect Mask"
+			print ("Mask:" , mask, "Incorrect Maskqweqweqwe:" , incorrect_mask, " W/Mask:" , without_mask)
+		else:
+			label = "Without Mask"
+			print ("Mask:" , mask, "Incorrect Mask:" , incorrect_mask, " W/Maskqweqweqwe:" , without_mask)
 		
-		# print ("Mask:" , mask, "Without Mask:" , withoutMask) if mask > withoutMask else print ("without Mask:" , withoutMask, "Mask: ", mask)
-        
+		# print ("Mask:" , mask, "Without Mask:" , incorrect_mask) if mask > incorrect_mask else print ("without Mask:" , incorrect_mask, "Mask: ", mask)
+		# print ("Mask:" , mask, "Incorrect Mask:" , incorrect_mask, " W/Mask:" , without_mask)
 		color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
+		if label == "Mask":
+			color = (0, 255, 0)
+		elif label == "Incorrect Mask":
+			(0, 0, 255)
+		else:
+			(255, 0, 0)
 
 		# include the probability in the label
-		label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
+		label = "{}: {:.2f}%".format(label, max(mask, incorrect_mask) * 100)
 
 		# display the label and bounding box rectangle on the output
 		# frame
