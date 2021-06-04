@@ -84,19 +84,24 @@ weightsPath = r"face_detector\res10_300x300_ssd_iter_140000.caffemodel"
 faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
 
 # load the face mask detector model from disk
-maskNet = load_model("mask_detector.model")
+maskNet = load_model("mask_detector_model.model")
 
 print("[INFO] starting reading file...")
 
+DIRECTORY = r"C:\Users\RaihanSatar\OneDrive\Desktop\Soft Computing Face Recognition\testing"
+
 loop = 1
-while loop < 4: # change to loop in reading file
+for file in os.listdir(DIRECTORY): 
+	path = os.path.join(DIRECTORY, file)
+	
+	# while loop < 4: # change to loop in reading file
 
 	# grab the image from the threaded video stream and resize it
 	# to have a maximum width of 400 pixels
 	# image = vs.read()
-	image = cv2.imread(r'dataset\incorrect_mask\00007_Mask_Mouth_Chin.jpg')
+	image = cv2.imread(path)
 	# image = imutils.resize(image, width=400)
-	cv2.imshow('image', image)
+	# cv2.imshow('image', image)
 	# detect faces in the image and determine if they are wearing a
 	# face mask or not
 	(locs, preds) = detect_and_predict_mask(image, faceNet, maskNet)
@@ -105,16 +110,42 @@ while loop < 4: # change to loop in reading file
 	for (box, pred) in zip(locs, preds):
 		# unpack the bounding box and predictions
 		(startX, startY, endX, endY) = box
-		(mask, withoutMask) = pred
+
+		(chin_mask, correct_mask, mouth_chin_mask, nose_mouth_mask, without_mask) = pred
+
 
 		# determine the class label and color we'll use to draw
 		# the bounding box and text
-		label = "Mask" if mask > withoutMask else "Incorrect Mask"
+		if correct_mask > without_mask and correct_mask > chin_mask and correct_mask > mouth_chin_mask and correct_mask > nose_mouth_mask:
+			label = "Correct Mask"
+			# print ("Maskqweqweqwe:" , correct_mask, "Incorrect Mask:" , mouth_chin_mask, " W/Mask:" , without_mask)
+		elif chin_mask > without_mask and chin_mask > correct_mask and chin_mask > mouth_chin_mask and chin_mask > nose_mouth_mask:
+			label = "Incorrect Mask - Chin Only"
+			# print ("Mask:" , correct_mask, "Incorrect Maskqweqweqwe:" , mouth_chin_mask, " W/Mask:" , without_mask)
+		elif mouth_chin_mask > without_mask and mouth_chin_mask > chin_mask and mouth_chin_mask > correct_mask and mouth_chin_mask > nose_mouth_mask:
+			label = "Incorrect Mask = Mouth And Chin Only"
+			# print ("Mask:" , correct_mask, "Incorrect Maskqweqweqwe:" , mouth_chin_mask, " W/Mask:" , without_mask)
+		elif nose_mouth_mask > without_mask and nose_mouth_mask > chin_mask and nose_mouth_mask > mouth_chin_mask and nose_mouth_mask > correct_mask:
+			label = "Incorrect Mask - Mouth and Nose Only"
+			# print ("Mask:" , correct_mask, "Incorrect Maskqweqweqwe:" , mouth_chin_mask, " W/Mask:" , without_mask)
+		else:
+			label = "No Mask"
+			# print ("Mask:" , correct_mask, "Incorrect Mask:" , mouth_chin_mask, " W/Maskqweqweqwe:" , without_mask)
 		
-		color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
+		# Set color of label
+		if label == "Correct Mask":
+			color = (0, 255, 0)
+		elif label == "Incorrect Mask - Chin Only":
+			color = (156, 200, 255)
+		elif label == "Incorrect Mask = Mouth And Chin Only":
+			color = (155, 155, 155)
+		elif label == "Incorrect Mask - Mouth and Nose Only":
+			color = (0, 255, 255)
+		else:
+			color = (0, 0, 255)
 
 		# include the probability in the label
-		label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
+		label = "{}: {:.2f}%".format(label, max(without_mask, correct_mask, chin_mask, mouth_chin_mask, nose_mouth_mask) * 100)
 
 		# display the label and bounding box rectangle on the output
 		# image
@@ -122,21 +153,19 @@ while loop < 4: # change to loop in reading file
 			cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
 		cv2.rectangle(image, (startX, startY), (endX, endY), color, 2)
 
-	if label == "Mask":
-		filename = "/output_picture/correct/filename"+ str(loop)+ ".jpg"
-	else:
-		filename = "/output_picture/incorrect/filename"+ str(loop)+ ".jpg"
+	filename = "output_picture/image_"+ str(loop)+ ".jpg"
 	cv2.imwrite(filename, image)
-	print(loop)
+	# key = cv2.waitKey(1) & 0xFF
+	# print(loop)
 	loop = loop + 1
 
 	# show the output image
-	cv2.imshow("image", image)
-	key = cv2.waitKey(1) & 0xFF
+	# cv2.imshow("image", image)
+	# key = cv2.waitKey(0) & 0xFF
 
 	# if the `q` key was pressed, break from the loop
-	if key == ord("q"):
-		break
+	# if key == ord("q"):
+	# 	continue
 
 # do a bit of cleanup
 cv2.destroyAllWindows()

@@ -102,7 +102,7 @@ while True:
 	for (box, pred) in zip(locs, preds):
 		# unpack the bounding box and predictions
 		(startX, startY, endX, endY) = box
-		# (mask, incorrect_mask, without_mask) = pred
+		
 		(chin_mask, correct_mask, mouth_chin_mask, nose_mouth_mask, without_mask) = pred
 		
 		# determine the class label and color we'll use to draw
