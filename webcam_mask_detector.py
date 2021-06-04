@@ -1,30 +1,3 @@
-# # import the opencv library
-# import cv2
-# # from google.colab.patches import cv2_imshow
-  
-# # define a video capture object
-# vid = cv2.VideoCapture(0)
-  
-# while(True):
-      
-#     # Capture the video frame
-#     # by frame
-#     ret, frame = vid.read()
-  
-#     # Display the resulting frame
-#     cv2.imshow('Video', frame)
-      
-#     # the 'q' button is set as the
-#     # quitting button you may use any
-#     # desired button of your choice
-#     if cv2.waitKey(1) & 0xFF == ord('q'):
-#         break
-  
-# # After the loop release the cap object
-# vid.release()
-# # Destroy all the windows
-# cv2.destroyAllWindows()
-
 
 # import the necessary packages
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
@@ -106,7 +79,8 @@ weightsPath = r"face_detector\res10_300x300_ssd_iter_140000.caffemodel"
 faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
 
 # load the face mask detector model from disk
-maskNet = load_model("mask_detectorv2.model")
+# maskNet = load_model("mask_detectorv2.model")
+maskNet = load_model("mask_detector_model.model")
 
 # initialize the video stream
 print("[INFO] starting video stream...")
@@ -124,34 +98,46 @@ while True:
 	(locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
 	# loop over the detected face locations and their corresponding
 	# locations
+	
 	for (box, pred) in zip(locs, preds):
 		# unpack the bounding box and predictions
 		(startX, startY, endX, endY) = box
-		(mask, incorrect_mask, without_mask) = pred
-
+		# (mask, incorrect_mask, without_mask) = pred
+		(chin_mask, correct_mask, mouth_chin_mask, nose_mouth_mask, without_mask) = pred
+		
 		# determine the class label and color we'll use to draw
 		# the bounding box and text
 		# label = "Mask" if mask > incorrect_mask else "Incorrect Mask"
-		if mask > incorrect_mask and mask > without_mask:
-			label = "Mask"
-			print ("Maskqweqweqwe:" , mask, "Incorrect Mask:" , incorrect_mask, " W/Mask:" , without_mask)
-		elif incorrect_mask > without_mask:
-			label = "Incorrect Mask"
-			print ("Mask:" , mask, "Incorrect Maskqweqweqwe:" , incorrect_mask, " W/Mask:" , without_mask)
+		if correct_mask > without_mask and correct_mask > chin_mask and correct_mask > mouth_chin_mask and correct_mask > nose_mouth_mask:
+			label = "Correct Mask"
+			# print ("Maskqweqweqwe:" , correct_mask, "Incorrect Mask:" , mouth_chin_mask, " W/Mask:" , without_mask)
+		elif chin_mask > without_mask and chin_mask > correct_mask and chin_mask > mouth_chin_mask and chin_mask > nose_mouth_mask:
+			label = "Incorrect Mask - Chin Only"
+			# print ("Mask:" , correct_mask, "Incorrect Maskqweqweqwe:" , mouth_chin_mask, " W/Mask:" , without_mask)
+		elif mouth_chin_mask > without_mask and mouth_chin_mask > chin_mask and mouth_chin_mask > correct_mask and mouth_chin_mask > nose_mouth_mask:
+			label = "Incorrect Mask = Mouth And Chin Only"
+			# print ("Mask:" , correct_mask, "Incorrect Maskqweqweqwe:" , mouth_chin_mask, " W/Mask:" , without_mask)
+		elif nose_mouth_mask > without_mask and nose_mouth_mask > chin_mask and nose_mouth_mask > mouth_chin_mask and nose_mouth_mask > correct_mask:
+			label = "Incorrect Mask - Mouth and Nose Only"
+			# print ("Mask:" , correct_mask, "Incorrect Maskqweqweqwe:" , mouth_chin_mask, " W/Mask:" , without_mask)
 		else:
 			label = "No Mask"
-			print ("Mask:" , mask, "Incorrect Mask:" , incorrect_mask, " W/Maskqweqweqwe:" , without_mask)
+			# print ("Mask:" , correct_mask, "Incorrect Mask:" , mouth_chin_mask, " W/Maskqweqweqwe:" , without_mask)
 		
 		# Set color of label
-		if label == "Mask":
+		if label == "Correct Mask":
 			color = (0, 255, 0)
-		elif label == "Incorrect Mask":
+		elif label == "Incorrect Mask - Chin Only":
+			color = (156, 200, 255)
+		elif label == "Incorrect Mask = Mouth And Chin Only":
+			color = (155, 155, 155)
+		elif label == "Incorrect Mask - Mouth and Nose Only":
 			color = (0, 255, 255)
 		else:
 			color = (0, 0, 255)
 
 		# include the probability in the label
-		label = "{}: {:.2f}%".format(label, max(mask, incorrect_mask, without_mask) * 100)
+		label = "{}: {:.2f}%".format(label, max(without_mask, correct_mask, chin_mask, mouth_chin_mask, nose_mouth_mask) * 100)
 
 		# display the label and bounding box rectangle on the output
 		# frame
