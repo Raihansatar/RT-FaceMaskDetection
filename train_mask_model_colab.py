@@ -36,7 +36,7 @@ print("[INFO] Loading images...")
 data = []
 labels = []
 for category in CATEGORIES:
-    current_image = 0;
+    current_image = 0
     path = os.path.join(DIRECTORY, category)
     for subfolder in os.listdir(path): # return all dir in that path
       # image_no = 0
@@ -46,7 +46,7 @@ for category in CATEGORIES:
       print(img_path)
       image = load_img(img_path, target_size=(224, 224))
       image = img_to_array(image) # convert image to array
-      image = preprocess_input(image) # mobile app related??
+      image = preprocess_input(image)
 
       print (str(current_image) +  " of " + str(len(os.listdir(path))) + " in " + category)
       current_image = current_image + 1
@@ -64,14 +64,14 @@ print("Finish")
 # perform one-hot encoding on the labels
 lb = LabelBinarizer()
 labels = lb.fit_transform(labels)
-# labels = to_categorical(labels)
 
 data = np.array(data, dtype="float32")
 labels = np.array(labels)
-print("Splitting")
-(trainX, testX, trainY, testY) = train_test_split(data, labels, test_size=0.20, stratify=labels, random_state=42) # can be modified
+
+(trainX, testX, trainY, testY) = train_test_split(data, labels, test_size=0.20, stratify=labels, random_state=42) 
 
 # construct the training image generator for data augmentation
+# Generate batches of tensor image data with real-time data augmentation.
 aug = ImageDataGenerator(
 	rotation_range=20,
 	zoom_range=0.15,

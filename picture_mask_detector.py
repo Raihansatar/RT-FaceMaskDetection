@@ -4,16 +4,10 @@
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
-from imutils.video import VideoStream
 import numpy as np
-import imutils
-import time
 import cv2
 import os
 
-# path = r'dataset\correct_mask\00000_Mask.jpg'
-# image = cv2.imread(path, 0)
-# cv2.imshow('image', image)
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
 	# grab the dimensions of the frame and then construct a blob
@@ -98,10 +92,8 @@ for file in os.listdir(DIRECTORY):
 
 	# grab the image from the threaded video stream and resize it
 	# to have a maximum width of 400 pixels
-	# image = vs.read()
 	image = cv2.imread(path)
-	# image = imutils.resize(image, width=400)
-	# cv2.imshow('image', image)
+
 	# detect faces in the image and determine if they are wearing a
 	# face mask or not
 	(locs, preds) = detect_and_predict_mask(image, faceNet, maskNet)
@@ -118,26 +110,21 @@ for file in os.listdir(DIRECTORY):
 		# the bounding box and text
 		if correct_mask > without_mask and correct_mask > chin_mask and correct_mask > mouth_chin_mask and correct_mask > nose_mouth_mask:
 			label = "Correct Mask"
-			# print ("Maskqweqweqwe:" , correct_mask, "Incorrect Mask:" , mouth_chin_mask, " W/Mask:" , without_mask)
 		elif chin_mask > without_mask and chin_mask > correct_mask and chin_mask > mouth_chin_mask and chin_mask > nose_mouth_mask:
 			label = "Incorrect Mask - Chin Only"
-			# print ("Mask:" , correct_mask, "Incorrect Maskqweqweqwe:" , mouth_chin_mask, " W/Mask:" , without_mask)
 		elif mouth_chin_mask > without_mask and mouth_chin_mask > chin_mask and mouth_chin_mask > correct_mask and mouth_chin_mask > nose_mouth_mask:
-			label = "Incorrect Mask = Mouth And Chin Only"
-			# print ("Mask:" , correct_mask, "Incorrect Maskqweqweqwe:" , mouth_chin_mask, " W/Mask:" , without_mask)
+			label = "Incorrect Mask - Mouth And Chin Only"
 		elif nose_mouth_mask > without_mask and nose_mouth_mask > chin_mask and nose_mouth_mask > mouth_chin_mask and nose_mouth_mask > correct_mask:
 			label = "Incorrect Mask - Mouth and Nose Only"
-			# print ("Mask:" , correct_mask, "Incorrect Maskqweqweqwe:" , mouth_chin_mask, " W/Mask:" , without_mask)
 		else:
 			label = "No Mask"
-			# print ("Mask:" , correct_mask, "Incorrect Mask:" , mouth_chin_mask, " W/Maskqweqweqwe:" , without_mask)
 		
 		# Set color of label
 		if label == "Correct Mask":
 			color = (0, 255, 0)
 		elif label == "Incorrect Mask - Chin Only":
 			color = (156, 200, 255)
-		elif label == "Incorrect Mask = Mouth And Chin Only":
+		elif label == "Incorrect Mask - Mouth And Chin Only":
 			color = (155, 155, 155)
 		elif label == "Incorrect Mask - Mouth and Nose Only":
 			color = (0, 255, 255)
@@ -156,7 +143,6 @@ for file in os.listdir(DIRECTORY):
 	filename = "output_picture/image_"+ str(loop)+ ".jpg"
 	cv2.imwrite(filename, image)
 	# key = cv2.waitKey(1) & 0xFF
-	# print(loop)
 	loop = loop + 1
 
 	# show the output image
