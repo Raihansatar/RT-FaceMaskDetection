@@ -1,17 +1,11 @@
+# This is python code for splitting the image in a folder into their categories folder
+
 import os
 import re
 import shutil
 DIRECTORY = r"C:\Users\RaihanSatar\OneDrive\Desktop\Soft Computing Face Recognition\dataset"
-CATEGORIES = ["incorrect_mask"]
+CATEGORIES = ["without_mask", "correct_mask", "chin_mask", "mouth_chin_mask", "nose_mouth_mask"]
 
-
-# SPLIT = ["MaskMouthChin"]
-
-# MaskMouthChin
-# MaskChin
-# MaskNose
-# MaskNoseMouth
-# MaskMouth
 
 for category in CATEGORIES:
     path = os.path.join(DIRECTORY, category)
@@ -32,8 +26,3 @@ for category in CATEGORIES:
         newPath = os.path.join(newPath, subfolder)
         print(newPath)
         shutil.move(filepath, newPath)
-    #     break
-    # break
-        # subpath = os.path.join(path, subfolder)
-        # for file in os.listdir(subpath):
-        #     print(file)
