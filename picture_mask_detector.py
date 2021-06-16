@@ -74,7 +74,7 @@ maskNet = load_model("mask_detector_model.model")
 
 print("[INFO] starting reading file...")
 
-DIRECTORY = r"C:\Users\RaihanSatar\OneDrive\Desktop\Soft Computing Face Recognition\testing"
+DIRECTORY = r"C:\Users\RaihanSatar\OneDrive\Desktop\Soft Computing Face Recognition\testing_"
 
 loop = 1
 for file in os.listdir(DIRECTORY): 
