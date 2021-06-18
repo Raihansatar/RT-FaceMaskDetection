@@ -119,7 +119,7 @@ H = model.fit(
 print("[INFO] evaluating network...")
 predIdxs = model.predict(testX, batch_size=BS)
 
-# for each image in the testing set we need to find the index of the label with corresponding largest predicted probability
+# for each image in the testing set we need to fiSnd the index of the label with corresponding largest predicted probability
 predIdxs = np.argmax(predIdxs, axis=1)
 
 # show a nicely formatted classification report

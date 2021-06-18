@@ -63,6 +63,7 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
         
 	# return a 2-tuple of the face locations and their corresponding locations
 	return (locs, preds)
+	
 
 # load our serialized face detector model from disk
 prototxtPath = r"face_detector\deploy.prototxt"
